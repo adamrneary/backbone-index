@@ -3,7 +3,8 @@
 
 Backbone.Index = function(Collection) {
   Collection.prototype.where = function(args) {
-    return getIndex(this, args)[getValue(args)];
+    var keys = _.keys(args).sort();
+    return getIndex(this, args, keys)[getValue(args, keys)];
   };
 
   Collection.prototype.query = function(args) {
@@ -17,43 +18,34 @@ Backbone.Index = function(Collection) {
   };
 };
 
-function getIndex(collection, args) {
-  var keys = _.keys(args).sort();
+function getIndex(collection, args, keys) {
   var name = keys.join('');
 
   if (!collection._index) collection._index = {};
   if (!collection._index[name]) {
-    var len = keys.length;
     collection._index[name] = collection.groupBy(function(item) {
-      var res = '';
-      for (var i = 0; i < len; i++) res += item.get(keys[i]);
-      return res;
+      return getValue(item.attributes, keys);
     });
   }
 
   return collection._index[name];
 }
 
-function getValue(args) {
-  var keys = _.keys(args).sort();
+function getValue(args, keys) {
   var res = '';
   for (var i = 0, len = keys.length; i < len; i++) res += args[keys[i]];
   return res;
 }
 
 function getKeys(pairs) {
-  var i, j, len, len2, obj;
+  var i, j, len, len2;
   var res  = [];
-  var pair = _.first(pairs);
-  var key  = pair[0];
-  var val  = pair[1];
+  var pair = _.first(pairs), key = pair[0], val = pair[1];
 
   if (!_.isArray(val)) val = [val];
-  for (i = 0, len = val.length; i < len; i++) {
-    obj = {};
-    obj[key] = val[i];
-    res.push(obj);
-  }
+  for (i = 0, len = val.length; i < len; i++)
+    res.push(_.object([key], [val[i]]));
+
   if (pairs.length > 1) {
     var children = getKeys(_.rest(pairs));
     var merged   = [];

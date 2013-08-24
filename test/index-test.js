@@ -31,10 +31,15 @@ describe('Backbone.index', function() {
   });
 
   it('static #query', function() {
-    expect(users.query({ companyId: 1, officeId: 2 })).length(2);
     expect(users.query({ companyId: 1, officeId: [1, 3] })).length(3);
     expect(users.query({ officeId: [1, 2, 3, 5], companyId: 3 })).length(1);
     expect(users.query({ companyId: [1, 2], officeId: [1, 5] })).length(4);
     expect(Object.keys(users._index)).eql(['companyIdofficeId']);
+  });
+
+  it('static query without array params', function() {
+    expect(users.query({ companyId: 1 })).length(5);
+    expect(users.query({ companyId: 1, officeId: 2 })).length(2);
+    expect(Object.keys(users._index)).length(2);
   });
 });
