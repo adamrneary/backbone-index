@@ -1,0 +1,19 @@
+{
+  "name": "backbone-index",
+  "description": "Generates indexes on the fly for crazy fast filtering",
+  "version": "0.1.0",
+  "main": "index.js",
+  "dependencies": {
+    "jquery": "~1.10.x",
+    "underscore": "~1.5.x",
+    "backbone": "~1.0.0"
+  },
+  "devDependencies": {
+    "chai": "~1.7.x"
+  },
+  "ignore": [
+    "**/.*",
+    "test",
+    "package.json"
+  ]
+}

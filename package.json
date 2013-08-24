@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "postinstall": "bower install --quiet",
+    "test": "testem -f test/testem.json ci",
+    "start": "testem -f test/testem.json",
+    "stat": "cloc index.js --by-file --quiet && cloc test/*.js --by-file --quiet"
+  },
+  "devDependencies": {
+    "bower": "1.2.x",
+    "testem": "0.4.x"
+  }
+}
