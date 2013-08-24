@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Backbone.Index - performance</title>
+  </head>
+  <body>
+    <script src="bower_components/jquery/jquery.js"></script>
+    <script src="bower_components/underscore/underscore.js"></script>
+    <script src="bower_components/backbone/backbone.js"></script>
+    <script src="index.js"></script>
+    <script>
+      (function() {
+        var Users1 = Backbone.Collection.extend({});
+        var Users2 = Backbone.Collection.extend({});
+
+        Backbone.Index(Users1);
+        console.log('users1 - with Backbone.Index, users2 - regular collection');
+
+        _.times(4, function(i) {
+          var size    = Math.pow(10, i);
+          var data    = [];
+          var queries = [];
+          _.times(size, function(i) {
+            data.push({ id: i, companyId: _.random(1, 10), officeId: _.random(1, 10), name: 'User' + i });
+            queries.push({ companyId: _.random(1, 10), officeId: _.random(1, 10) });
+          });
+
+          var users1 = new Users1(data);
+          var users2 = new Users2(data);
+
+          console.time('users1-' + size);
+          var sum1 = queries.reduce(function(memo, query) {
+            memo += users1.where(query).length;
+          }, 0);
+          console.timeEnd('users1-' + size);
+
+          console.time('users2-' + size);
+          var sum2 = queries.reduce(function(memo, query) {
+            memo += users2.where(query).length;
+          }, 0);
+          console.timeEnd('users2-' + size);
+
+          if (sum1 !== sum2) throw new Error('something goes wrong, sum1 !== sum2');
+        });
+
+        console.log('compare query and where');
+
+        _.times(5, function(i) {
+          var size    = Math.pow(10, i);
+          var data    = [];
+          var queries = [];
+          _.times(size, function(i) {
+            data.push({ id: i, companyId: _.random(1, 10), officeId: _.random(1, 10), name: 'User' + i });
+            queries.push({ companyId: _.random(1, 10), officeId: _.random(1, 10) });
+          });
+          var users1 = new Users1(data);
+          var users2 = new Users1(data);
+
+          console.time('query-' + size);
+          var sum2 = queries.reduce(function(memo, query) {
+            memo += users1.query(query).length;
+          }, 0);
+          console.timeEnd('query-' + size);
+
+          console.time('where-' + size);
+          var sum1 = queries.reduce(function(memo, query) {
+            memo += users2.where(query).length;
+          }, 0);
+          console.timeEnd('where-' + size);
+
+          if (sum1 !== sum2) throw new Error('something goes wrong, sum1 !== sum2');
+        });
+      }).call(this)
+    </script>
+  </body>
+</html>

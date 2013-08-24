@@ -34,15 +34,12 @@ var users = new Users([
   { id: 9, companyId: 2, officeId: 5, name: 'Adam'  }
 ]);
 
-// All tests measured with performance.now() method
-// ~
-users.where({ companyId: 1 }); // => [Array(5)]
+users.where({ companyId: 1 }); // => [Array(5)] ~ 0.16ms
 
 // next requests use index and much faster than first one
-// ~
 _.times(100, function() {
   users.where({ companyId: _.random(1, 3) });
-});
+}); // => ~ 0.37ms
 ```
 
 ## How it works
@@ -61,6 +58,7 @@ _.times(100, function() {
 ### collection#where(attributes)
 
   Same semantic as [Backbone.Collection.prototype.where](http://documentcloud.github.io/backbone/#Collection-where)
+  **Performance tip**: always prefer `where`, because it's 3-5 faster than `query`.
 
 ### collection.query(attributes)
 

@@ -4,7 +4,7 @@
 Backbone.Index = function(Collection) {
   Collection.prototype.where = function(args) {
     var keys = _.keys(args).sort();
-    return getIndex(this, args, keys)[getValue(args, keys)];
+    return getIndex(this, args, keys)[getValue(args, keys)] || [];
   };
 
   Collection.prototype.query = function(args) {
@@ -12,9 +12,9 @@ Backbone.Index = function(Collection) {
     var result = [];
 
     for (var i = 0, len = keys.length; i < len; i++)
-      result.push.apply(result, this.where(keys[i]));
+      result = result.concat(this.where(keys[i]));
 
-    return _.uniq(result);
+    return result;
   };
 };
 
@@ -51,7 +51,7 @@ function getKeys(pairs) {
     var merged   = [];
     for (i = 0, len = res.length; i < len; i++)
       for (j = 0, len2 = children.length; j < len2; j++)
-        merged[len2*i + j] = _.extend({}, children[j], res[i]);
+        merged[len2*i + j] = _.extend({}, res[i], children[j]);
     return merged;
   } else {
     return res;
