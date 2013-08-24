@@ -21,9 +21,20 @@ describe('Backbone.index', function() {
     expect(Users.prototype.query).exist;
   });
 
-  it('runs simple where and populate this._index', function() {
+  it('static #where', function() {
     expect(_.isEmpty(users._index)).true;
     expect(users.where({ companyId: 1 })).length(5);
     expect(Object.keys(users._index)).eql(['companyId']);
+
+    expect(users.where({ companyId: 3 })).length(1);
+    expect(Object.keys(users._index)).eql(['companyId']);
+  });
+
+  it('static #query', function() {
+    expect(users.query({ companyId: 1, officeId: 2 })).length(2);
+    expect(users.query({ companyId: 1, officeId: [1, 3] })).length(3);
+    expect(users.query({ officeId: [1, 2, 3, 5], companyId: 3 })).length(1);
+    expect(users.query({ companyId: [1, 2], officeId: [1, 5] })).length(4);
+    expect(Object.keys(users._index)).eql(['companyIdofficeId']);
   });
 });

@@ -67,7 +67,7 @@ _.times(100, function() {
   If `where` is a simple filtering, `query` allows to use array as a value.
 
  ```js
- users.where({ companyId: 1, officeId: [1, 3] }); // => Array(3)
+ users.query({ companyId: 1, officeId: [1, 3] }); // => Array(3)
  ```
 
 ## Development
