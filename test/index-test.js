@@ -17,29 +17,66 @@ describe('Backbone.index', function() {
     ]);
   });
 
-  it('adds query method', function() {
+  it('adds where/query methods', function() {
+    expect(Users.prototype.where).exist;
     expect(Users.prototype.query).exist;
   });
 
-  it('static #where', function() {
-    expect(_.isEmpty(users._index)).true;
-    expect(users.where({ companyId: 1 })).length(5);
-    expect(Object.keys(users._index)).eql(['companyId']);
+  describe('static', function() {
+    it('#where', function() {
+      expect(_.isEmpty(users._index)).true;
+      expect(users.where({ companyId: 1 })).length(5);
+      expect(Object.keys(users._index)).eql(['companyId']);
 
-    expect(users.where({ companyId: 3 })).length(1);
-    expect(Object.keys(users._index)).eql(['companyId']);
+      expect(users.where({ companyId: 3 })).length(1);
+      expect(Object.keys(users._index)).eql(['companyId']);
+    });
+
+    it('#query', function() {
+      expect(users.query({ companyId: 1, officeId: [1, 3] })).length(3);
+      expect(users.query({ officeId: [1, 2, 3, 5], companyId: 3 })).length(1);
+      expect(users.query({ companyId: [1, 2], officeId: [1, 5] })).length(4);
+      expect(Object.keys(users._index)).eql(['companyIdofficeId']);
+    });
+
+    it('#query without array params', function() {
+      expect(users.query({ companyId: 1 })).length(5);
+      expect(users.query({ companyId: 1, officeId: 2 })).length(2);
+      expect(Object.keys(users._index)).length(2);
+    });
   });
 
-  it('static #query', function() {
-    expect(users.query({ companyId: 1, officeId: [1, 3] })).length(3);
-    expect(users.query({ officeId: [1, 2, 3, 5], companyId: 3 })).length(1);
-    expect(users.query({ companyId: [1, 2], officeId: [1, 5] })).length(4);
-    expect(Object.keys(users._index)).eql(['companyIdofficeId']);
-  });
+  describe('dynamic', function() {
+    it('handles `add` event', function() {
+      expect(users.where({ companyId: 3 })).length(1);
+      expect(users.query({ companyId: 2, officeId: [1, 3] })).length(1);
+      users.add([
+        { id: 10, companyId: 1, officeId: 2, name: 'Paul' },
+        { id: 11, companyId: 2, officeId: 3, name: 'Alex' },
+        { id: 12, companyId: 3, officeId: 2, name: 'Don'  },
+        { id: 13, companyId: 3, officeId: 3, name: 'Bert' }
+      ]);
+      expect(users.where({ companyId: 3 })).length(3);
+      expect(users.query({ companyId: 2, officeId: [1, 3] })).length(2);
+    });
 
-  it('static query without array params', function() {
-    expect(users.query({ companyId: 1 })).length(5);
-    expect(users.query({ companyId: 1, officeId: 2 })).length(2);
-    expect(Object.keys(users._index)).length(2);
+    it('handles `remove` event', function() {
+      expect(users.where({ companyId: 1, officeId: 2 })).length(2);
+      expect(users.query({ companyId: [1, 2, 3], officeId: [1, 2, 3, 5] })).length(9);
+      users.remove([users.get(4), users.get(5), users.get(6)]);
+
+      expect(users.where({ companyId: 1, officeId: 2 })).length(1);
+      expect(users.query({ companyId: 2, officeId: [1, 2, 3, 5] })).length(2);
+      expect(users.query({ companyId: [1, 2, 3] })).length(6);
+    });
+
+    it('handles `change` event', function() {
+      expect(users.where({ companyId: 1, officeId: 3 })).length(1);
+      users.get(5).set({ officeId: 2, name: 'Isabella' });
+      users.get(6).set({ name: 'Robert' });
+      expect(users.where({ companyId: 1, officeId: 3 })).length(0);
+    });
+
+    it('advanced `change` event with collection.set');
   });
 });

@@ -45,7 +45,7 @@
 
         console.log('compare query and where');
 
-        _.times(5, function(i) {
+        _.times(4, function(i) {
           var size    = Math.pow(10, i);
           var data    = [];
           var queries = [];
@@ -56,17 +56,17 @@
           var users1 = new Users1(data);
           var users2 = new Users1(data);
 
-          console.time('query-' + size);
-          var sum2 = queries.reduce(function(memo, query) {
-            memo += users1.query(query).length;
-          }, 0);
-          console.timeEnd('query-' + size);
-
           console.time('where-' + size);
           var sum1 = queries.reduce(function(memo, query) {
             memo += users2.where(query).length;
           }, 0);
           console.timeEnd('where-' + size);
+
+          console.time('query-' + size);
+          var sum2 = queries.reduce(function(memo, query) {
+            memo += users1.query(query).length;
+          }, 0);
+          console.timeEnd('query-' + size);
 
           if (sum1 !== sum2) throw new Error('something goes wrong, sum1 !== sum2');
         });

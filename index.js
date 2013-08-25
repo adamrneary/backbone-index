@@ -18,17 +18,18 @@ Backbone.Index = function(Collection) {
   };
 };
 
-function getIndex(collection, args, keys) {
+function getIndex(coll, args, keys) {
   var name = keys.join('');
 
-  if (!collection._index) collection._index = {};
-  if (!collection._index[name]) {
-    collection._index[name] = collection.groupBy(function(item) {
+  if (!coll._index) setupCollection(coll);
+  if (!coll._index[name]) {
+    coll._indexKeys.push(keys);
+    coll._index[name] = coll.groupBy(function(item) {
       return getValue(item.attributes, keys);
     });
   }
 
-  return collection._index[name];
+  return coll._index[name];
 }
 
 function getValue(args, keys) {
@@ -56,6 +57,53 @@ function getKeys(pairs) {
   } else {
     return res;
   }
+}
+
+function setupCollection(coll) {
+  coll._index     = {};
+  coll._indexKeys = [];
+
+  coll.on('add', onadd);
+  coll.on('remove', onremove);
+  coll.on('change', onchange);
+}
+
+function onadd(model, coll) {
+  _.forEach(coll._indexKeys, function(keys) {
+    var name  = keys.join('');
+    var index = coll._index[name];
+    var value = getValue(model.attributes, keys);
+
+    if (_.has(index, value)) index[value].push(model);
+    else index[value] = [value];
+  });
+}
+
+function onremove(model, coll) {
+  _.forEach(coll._indexKeys, function(keys) {
+    var name  = keys.join('');
+    var index = coll._index[name];
+    var value = getValue(model.attributes, keys);
+
+    if (_.has(index, value)) index[value] = _.without(index[value], model);
+  });
+}
+
+function onchange(model) {
+  var coll        = model.collection;
+  var changedKeys = _.keys(model.changedAttributes());
+  var prevAttrs   = model.previousAttributes();
+
+  _.forEach(coll._indexKeys, function(keys) {
+    if (!_.some(keys, function(key) { return _.include(changedKeys, key) })) return;
+    var name  = keys.join('');
+    var index = coll._index[name];
+    var value = getValue(model.attributes, keys);
+    var prevValue = getValue(prevAttrs, keys);
+
+    index[prevValue] = _.without(index[prevValue], model);
+    index[value].push(model);
+  });
 }
 
 }).call(this, _, Backbone);
