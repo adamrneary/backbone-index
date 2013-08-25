@@ -6,9 +6,10 @@
  */
 
 Backbone.Index = function(Collection) {
-  Collection.prototype.where = function(args) {
+  Collection.prototype.where = function(args, first) {
     var keys = _.keys(args).sort();
-    return getIndex(this, args, keys)[getValue(args, keys)] || [];
+    var res  =  getIndex(this, args, keys)[getValue(args, keys)] || [];
+    return first ? _.first(res) : res;
   };
 
   // It just calls `where` for every pairs of keys and
