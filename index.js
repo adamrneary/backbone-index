@@ -63,47 +63,46 @@ function setupCollection(coll) {
   coll._index     = {};
   coll._indexKeys = [];
 
-  coll.on('add', onadd);
-  coll.on('remove', onremove);
+  coll.on('add', forEachKeys(addItem));
+  coll.on('remove', forEachKeys(removeItem));
   coll.on('change', onchange);
 }
 
-function onadd(model, coll) {
-  _.forEach(coll._indexKeys, function(keys) {
-    var name  = keys.join('');
-    var index = coll._index[name];
-    var value = getValue(model.attributes, keys);
-
-    if (_.has(index, value)) index[value].push(model);
-    else index[value] = [value];
-  });
+function addItem(index, value, item) {
+  if (_.has(index, value)) index[value].push(item);
+  else index[value] = [value];
 }
 
-function onremove(model, coll) {
-  _.forEach(coll._indexKeys, function(keys) {
-    var name  = keys.join('');
-    var index = coll._index[name];
-    var value = getValue(model.attributes, keys);
-
-    if (_.has(index, value)) index[value] = _.without(index[value], model);
-  });
+function removeItem(index, value, item) {
+  if (_.has(index, value))
+    index[value] = _.without(index[value], item);
 }
 
-function onchange(model) {
-  var coll        = model.collection;
-  var changedKeys = _.keys(model.changedAttributes());
-  var prevAttrs   = model.previousAttributes();
+function onchange(item) {
+  var changedKeys = _.keys(item.changedAttributes());
+  var isChanged   = _.bind(_.include, null, changedKeys);
+  var prevAttrs   = item.previousAttributes();
 
-  _.forEach(coll._indexKeys, function(keys) {
-    if (!_.some(keys, function(key) { return _.include(changedKeys, key) })) return;
-    var name  = keys.join('');
-    var index = coll._index[name];
-    var value = getValue(model.attributes, keys);
+  forEachKeys(function(index, value, item, keys) {
+    if (!_.some(keys, isChanged)) return;
     var prevValue = getValue(prevAttrs, keys);
 
-    index[prevValue] = _.without(index[prevValue], model);
-    index[value].push(model);
-  });
+    removeItem(index, prevValue, item);
+    addItem(index, value);
+  })(item);
+}
+
+function forEachKeys(cb) {
+  return function(item) {
+    var coll = item.collection;
+
+    _.forEach(coll._indexKeys, function(keys) {
+      var name  = keys.join('');
+      var index = coll._index[name];
+      var value = getValue(item.attributes, keys);
+      cb(index, value, item, keys);
+    });
+  };
 }
 
 }).call(this, _, Backbone);

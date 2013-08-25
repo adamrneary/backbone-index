@@ -74,9 +74,24 @@ describe('Backbone.index', function() {
       expect(users.where({ companyId: 1, officeId: 3 })).length(1);
       users.get(5).set({ officeId: 2, name: 'Isabella' });
       users.get(6).set({ name: 'Robert' });
+      users.get(1).set({ companyId: 3, officeId: 5 });
       expect(users.where({ companyId: 1, officeId: 3 })).length(0);
+      expect(users.query({ companyId: [1, 3], officeId: 5})).length(1);
     });
 
-    it('advanced `change` event with collection.set');
+    it('advanced collection.set event', function() {
+      expect(users.where({ officeId: 5 })).length(2);
+      expect(users.query({ companyId: 2, officeId: [1, 2, 3] })).length(1);
+      users.set([
+        { id: 3,  companyId: 3, officeId: 5, name: 'Bret' },
+        { id: 4,  companyId: 1, officeId: 2, name: 'Tom'  },
+        { id: 5,  companyId: 1, officeId: 3, name: 'Keit' },
+        { id: 6,  companyId: 2, officeId: 2, name: 'Anna' },
+        { id: 10, companyId: 1, officeId: 2, name: 'Paul' },
+        { id: 11, companyId: 2, officeId: 3, name: 'Alex' }
+      ]);
+      expect(users.where({ officeId: 5 })).length(1);
+      expect(users.query({ companyId: 1, officeId: [2, 3] })).length(3);
+    });
   });
 });
