@@ -5,7 +5,7 @@
 
   It useful for:
 
-  * you filter collection with selected keys more than 1 time.
+  * filtering collection with selected keys more than 5 times
   * in addition to default backbone.collection's `where` you need to run `query`,
     which accepts array as a key.
 
@@ -13,13 +13,13 @@
 
     $ bower install backbone-index --save
 
-  or include [index.js]() with script tag.
+  or include [index.js]() with `script` tag.
 
 ## Example
 
 ```js
 var Users = Backbone.Collection.extend({});
-// adds `where` and `query` methods
+// apply Backbone.Index to Collection
 Backbone.Index(Users);
 
 var users = new Users([
@@ -47,7 +47,7 @@ _.times(100, function() {
   When you run query at first time, backbone-index runs `groupBy` method
   and generates index for all possible combinations of value for selected keys.
   In second time it uses it index, and does not do any kind of filtering.
-  Also it subscribes on changes and manage this index for every `add` and `remove` events.
+  Also it subscribes on changes and manage this index for every `add`, `change` and `remove` events.
 
 ## API
 

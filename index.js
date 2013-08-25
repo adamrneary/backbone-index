@@ -1,12 +1,18 @@
 ;(function(_, Backbone) {
 'use strict';
 
+/**
+ * Add where/query to Collection
+ */
+
 Backbone.Index = function(Collection) {
   Collection.prototype.where = function(args) {
     var keys = _.keys(args).sort();
     return getIndex(this, args, keys)[getValue(args, keys)] || [];
   };
 
+  // It just calls `where` for every pairs of keys and
+  // concat result
   Collection.prototype.query = function(args) {
     var keys   = getKeys(_.pairs(args));
     var result = [];
@@ -18,18 +24,24 @@ Backbone.Index = function(Collection) {
   };
 };
 
+/**
+ * Work with indexes
+ */
+
 function getIndex(coll, args, keys) {
   var name = keys.join('');
 
   if (!coll._index) setupCollection(coll);
-  if (!coll._index[name]) {
-    coll._indexKeys.push(keys);
-    coll._index[name] = coll.groupBy(function(item) {
-      return getValue(item.attributes, keys);
-    });
-  }
+  if (!coll._index[name]) generateIndex(coll, name, keys);
 
   return coll._index[name];
+}
+
+function generateIndex(coll, name, keys) {
+  coll._indexKeys.push(keys);
+  coll._index[name] = coll.groupBy(function(item) {
+    return getValue(item.attributes, keys);
+  });
 }
 
 function getValue(args, keys) {
@@ -38,6 +50,9 @@ function getValue(args, keys) {
   return res;
 }
 
+// Recursive function that transform object with arrays of keys
+// to array of simple objects
+// FIXME: main bottleneck for query vs where
 function getKeys(pairs) {
   var i, j, len, len2;
   var res  = [];
@@ -59,6 +74,10 @@ function getKeys(pairs) {
   }
 }
 
+/**
+ * Manage events
+ */
+
 function setupCollection(coll) {
   coll._index     = {};
   coll._indexKeys = [];
@@ -70,7 +89,7 @@ function setupCollection(coll) {
 
 function addItem(index, value, item) {
   if (_.has(index, value)) index[value].push(item);
-  else index[value] = [value];
+  else index[value] = [item];
 }
 
 function removeItem(index, value, item) {
@@ -78,6 +97,13 @@ function removeItem(index, value, item) {
     index[value] = _.without(index[value], item);
 }
 
+// In general change is most complex event.
+// It tries to skip useless events with `changedAttributes` methods.
+//
+// When it needs to update index after change:
+// 1. find previous index value
+// 2. remove it
+// 3. add new value
 function onchange(item) {
   var changedKeys = _.keys(item.changedAttributes());
   var isChanged   = _.bind(_.include, null, changedKeys);
@@ -88,10 +114,11 @@ function onchange(item) {
     var prevValue = getValue(prevAttrs, keys);
 
     removeItem(index, prevValue, item);
-    addItem(index, value);
+    addItem(index, value, item);
   })(item);
 }
 
+// Helper to iterate `_indexKeys` on every event
 function forEachKeys(cb) {
   return function(item) {
     var coll = item.collection;

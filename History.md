@@ -1,4 +1,5 @@
-## 0.1.0 - 2013-08-24 - Intial release
+## 0.1.0 - 2013-08-.. - Initial release
 
   * methods where && query
-  * woth with dynamic collections
+  * work with dynamic collections
+  * ~ accept any king of collections

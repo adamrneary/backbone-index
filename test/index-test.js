@@ -1,4 +1,4 @@
-describe('Backbone.index', function() {
+describe('Backbone.Index', function() {
   var expect = window.chai.expect, users;
   var Users  = Backbone.Collection.extend({});
   Backbone.Index(Users);
