@@ -5,10 +5,12 @@
  * Add where/query to Collection
  */
 
-Backbone.Index = function(Collection) {
+Backbone.Index = function(Collection, options) {
+  if (!options) options = {};
+
   Collection.prototype.where = function(args, first) {
     var keys = _.keys(args).sort();
-    var res  =  getIndex(this, args, keys)[getValue(args, keys)] || [];
+    var res  =  getIndex(this, args, keys, options)[getValue(args, keys)] || [];
     return first ? _.first(res) : res;
   };
 
@@ -29,10 +31,10 @@ Backbone.Index = function(Collection) {
  * Work with indexes
  */
 
-function getIndex(coll, args, keys) {
+function getIndex(coll, args, keys, options) {
   var name = keys.join('');
 
-  if (!coll._index) setupCollection(coll);
+  if (!coll._index) setupCollection(coll, options);
   if (!coll._index[name]) generateIndex(coll, name, keys);
 
   return coll._index[name];
@@ -79,13 +81,13 @@ function getKeys(pairs) {
  * Manage events
  */
 
-function setupCollection(coll) {
+function setupCollection(coll, options) {
   coll._index     = {};
   coll._indexKeys = [];
 
   coll.on('add', forEachKeys(addItem));
   coll.on('remove', forEachKeys(removeItem));
-  coll.on('change', onchange);
+  if (!options.ignoreChange) coll.on('change', onchange);
 }
 
 function addItem(index, value, item) {
