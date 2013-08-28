@@ -74,13 +74,3 @@ _.times(100, function() {
  ```js
  users.query({ companyId: 1, officeId: [1, 3] }); // => Array(3)
  ```
-
-## Development
-
-  * `npm install` - to install development depenencies
-  * `npm test` - to ensure that all tests pass
-  * `npm start` - to start watch server for test suite
-
-## Licence
-
-  [Activecell](http://activecell.com/), MIT
