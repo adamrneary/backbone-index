@@ -1,4 +1,4 @@
-# Backbone.Index
+# Backbone.Index [![Build Status](https://circleci.com/gh/activecell/backbone-index.png)](https://circleci.com/gh/activecell/backbone-index)
 
   Simple, dynamic indexes for greasy-fast filtering of collections
 
@@ -12,7 +12,7 @@
 
     $ bower install backbone-index --save
 
-  or include [index.js]() with `script` tag.
+  or include [index.js](https://github.com/activecell/backbone-index/blob/master/index.js) with `script` tag.
 
 ## Example
 
