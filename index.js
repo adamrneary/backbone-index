@@ -67,7 +67,7 @@ function getKeys(pairs) {
   if (!_.isArray(val)) val = [val];
   for (i = 0, len = val.length; i < len; i++) {
     value = val[i];
-    if (_.has(value, 'id')) value = value.id;
+    if (value && value.id) value = value.id;
     res.push(_.object([key], [value]));
   }
 
