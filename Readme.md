@@ -61,10 +61,12 @@ _.times(100, function() {
 
 ### collection.where(attributes, [first])
 
-  Alias: **collection.query**
-  Same semantic as [Backbone.Collection.prototype.where](http://documentcloud.github.io/backbone/#Collection-where).
+  Alias: **collection.query**.
+
+  Same semantic as [Backbone.Collection::where](http://documentcloud.github.io/backbone/#Collection-where).
+
   Second boolean optional argument is for cases when you need only one value,
-  it's similar to [Backbone.Collection.prototype.findWhere](http://jashkenas.github.io/backbone/#Collection-findWhere).
+  it's similar to [Backbone.Collection::findWhere](http://jashkenas.github.io/backbone/#Collection-findWhere).
 
   As a query parameters you can pass values, arrays of values, or arrays of Backbone.Models.
 
