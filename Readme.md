@@ -59,18 +59,17 @@ _.times(100, function() {
 
   Apply index functionality to selected collection.
 
-### collection.where(attributes)
+### collection.where(attributes, [first])
 
-  Same semantic as [Backbone.Collection.prototype.where](http://documentcloud.github.io/backbone/#Collection-where)
+  Alias: **collection.query**
+  Same semantic as [Backbone.Collection.prototype.where](http://documentcloud.github.io/backbone/#Collection-where).
+  Second boolean optional argument is for cases when you need only one value,
+  it's similar to [Backbone.Collection.prototype.findWhere](http://jashkenas.github.io/backbone/#Collection-findWhere).
 
-  **Performance tip**: Prefer `where` unless you need to use an array as a
-  value, since `where` is 3-5x faster than `query`.
+  As a query parameters you can pass values, arrays of values, or arrays of Backbone.Models.
 
-### collection.query(attributes)
-
-  Whereas `where` provides simple filtering, `query` allows you to use an array
-  as a value, similar to how the ActiveRecord query methods work in rails.
-
- ```js
- users.query({ companyId: 1, officeId: [1, 3] }); // => Array(3)
+```js
+users.where({ companyId: 2, officeId: 2 });
+users.where({ companyId: 1, officeId: [1, 3] });
+users.where({ officeId: [office1, office2] });
  ```
