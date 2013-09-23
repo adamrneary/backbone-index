@@ -9,6 +9,9 @@ Backbone.Index = function(Collection, options) {
   if (!options) options = {};
 
   Collection.prototype.where = function(args, first) {
+    // use query for array arguments
+    if (_.filter(_.values(args), _.isArray).length) return this.query(args);
+
     var keys = _.keys(args).sort();
     var res  =  getIndex(this, args, keys, options)[getValue(args, keys)] || [];
     return first ? _.first(res) : res;

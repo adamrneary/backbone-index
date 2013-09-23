@@ -32,6 +32,10 @@ describe('Backbone.Index', function() {
       expect(Object.keys(users._index)).eql(['companyId']);
     });
 
+    it('#where with array params', function() {
+      expect(users.where({ companyId: 1, officeId: [1, 2, 3] })).length(5);
+    });
+
     it('#query', function() {
       expect(users.query({ companyId: 1, officeId: [1, 3] })).length(3);
       expect(users.query({ officeId: [1, 2, 3, 5], companyId: 3 })).length(1);
