@@ -60,13 +60,16 @@ function getValue(args, keys) {
 // to array of simple objects
 // FIXME: main bottleneck for query vs where
 function getKeys(pairs) {
-  var i, j, len, len2;
+  var i, j, len, len2, value;
   var res  = [];
   var pair = _.first(pairs), key = pair[0], val = pair[1];
 
   if (!_.isArray(val)) val = [val];
-  for (i = 0, len = val.length; i < len; i++)
-    res.push(_.object([key], [val[i]]));
+  for (i = 0, len = val.length; i < len; i++) {
+    value = val[i];
+    if (_.has(value, 'id')) value = value.id;
+    res.push(_.object([key], [value]));
+  }
 
   if (pairs.length > 1) {
     var children = getKeys(_.rest(pairs));

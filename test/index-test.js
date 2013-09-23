@@ -1,3 +1,4 @@
+/* globals Backbone, _ */
 describe('Backbone.Index', function() {
   var expect = window.chai.expect, users;
   var Users  = Backbone.Collection.extend({});
@@ -47,6 +48,11 @@ describe('Backbone.Index', function() {
       expect(users.query({ companyId: 1 })).length(5);
       expect(users.query({ companyId: 1, officeId: 2 })).length(2);
       expect(Object.keys(users._index)).length(2);
+    });
+
+    it('#query handles array of objects', function() {
+      var companies = [new Backbone.Model({id: 1}), new Backbone.Model({id: 2})];
+      expect(users.query({ companyId: companies })).length(8);
     });
   });
 
